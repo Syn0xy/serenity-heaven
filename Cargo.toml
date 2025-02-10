@@ -1,0 +1,9 @@
+[package]
+name = "serenity_heaven"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.14.2"
+thiserror = "2.0.11"
+perlin_noise = { git = "https://github.com/Syn0xy/personal-perlin-noise", branch = "main" }
