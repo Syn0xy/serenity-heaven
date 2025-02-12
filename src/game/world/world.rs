@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::{
     game::{player::Player, GTransform},
-    loader::TextureAssets,
+    loader::assets::TextureAssets,
 };
 
 use super::{chunk, chunk_coord::ChunkCoord, chunk_generator::ChunkGenerator};
