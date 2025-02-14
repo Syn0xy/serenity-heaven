@@ -1,7 +1,7 @@
-mod load_textures;
+mod plugin;
 
 pub mod asset_descriptions;
 pub mod assets;
 pub mod datas;
 
-pub use load_textures::*;
+pub use plugin::*;

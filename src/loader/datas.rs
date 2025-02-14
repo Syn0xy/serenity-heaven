@@ -1,55 +1,45 @@
-use super::asset_descriptions::{AssetDescription, AtlasDescription};
+use super::asset_descriptions::{AtlasDescription, TextureDescription};
 
 pub const TILE_SIZE: u32 = 16;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum AssetName {
-    Player(PlayerTexture),
-    Slime(SlimeTexture),
-    Tileset(NatureTexture),
+pub mod asset_name {
+    pub mod tileset {
+        pub const NATURE: usize = 0;
+    }
+    pub mod player {
+        pub const IDLE: usize = 1;
+    }
+    pub mod slime {
+        pub const IDLE: usize = 2;
+        pub const DEAD: usize = 3;
+        pub const JUMP: usize = 4;
+    }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PlayerTexture {
-    Idle,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum SlimeTexture {
-    Idle,
-    Dead,
-    Jump,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum NatureTexture {
-    Tileset,
-}
-
-pub(super) const TEXTURE_ASSET_DATAS: &[AssetDescription] = &[
+pub(super) const TEXTURE_ASSET_DATAS: &[TextureDescription] = &[
     // PLAYER
-    AssetDescription {
-        name: AssetName::Player(PlayerTexture::Idle),
+    TextureDescription {
+        id: asset_name::player::IDLE,
         path: "entities/player/player_idle.png",
     },
     // SLIME
-    AssetDescription {
-        name: AssetName::Slime(SlimeTexture::Idle),
+    TextureDescription {
+        id: asset_name::slime::IDLE,
         path: "entities/slime/slime_idle.png",
     },
-    AssetDescription {
-        name: AssetName::Slime(SlimeTexture::Dead),
+    TextureDescription {
+        id: asset_name::slime::DEAD,
         path: "entities/slime/slime_dead.png",
     },
-    AssetDescription {
-        name: AssetName::Slime(SlimeTexture::Jump),
+    TextureDescription {
+        id: asset_name::slime::JUMP,
         path: "entities/slime/slime_jump.png",
     },
 ];
 
 pub(super) const ATLAS_ASSET_DATAS: &[AtlasDescription] = &[AtlasDescription {
-    desc: AssetDescription {
-        name: AssetName::Tileset(NatureTexture::Tileset),
+    desc: TextureDescription {
+        id: asset_name::tileset::NATURE,
         path: "nature/tileset.png",
     },
     pixel_size: TILE_SIZE,

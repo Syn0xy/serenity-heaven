@@ -7,7 +7,7 @@ use bevy::{
 };
 
 use super::{
-    asset_descriptions::AtlasDescription,
+    asset_descriptions::{AssetDescription, AtlasDescription},
     assets::{AtlasAsset, TextureAsset, TextureAssets},
     datas,
 };
@@ -21,10 +21,13 @@ impl Plugin for LoaderPlugin {
     }
 }
 
-fn load_texture<T>(asset_server: &Res<AssetServer>, asset_description: &T) -> TextureAsset<T> {
+fn load_texture<T>(asset_server: &Res<AssetServer>, asset_description: &T) -> TextureAsset<T>
+where
+    T: AssetDescription + Clone,
+{
     TextureAsset {
-        desc: *asset_description,
-        image: asset_server.load(asset_description.path),
+        desc: asset_description.clone(),
+        image: asset_server.load(asset_description.get_path()),
     }
 }
 
@@ -35,12 +38,12 @@ fn load_textures(
 ) {
     for asset in datas::TEXTURE_ASSET_DATAS {
         let texture = load_texture(&asset_server, asset);
-        texture_assets.textures.insert(asset.name, texture);
+        texture_assets.textures.insert(asset.id, texture);
     }
 
     for asset in datas::ATLAS_ASSET_DATAS {
         let atlas = load_atlas(&asset_server, &mut texture_atlases, asset);
-        texture_assets.atlases.insert(asset.name, atlas);
+        texture_assets.atlases.insert(asset.id, atlas);
     }
 }
 

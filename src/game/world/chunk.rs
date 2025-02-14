@@ -14,11 +14,7 @@ use bevy::{
 
 use crate::{
     game::GTransform,
-    loader::{
-        self,
-        assets::TextureAssets,
-        datas::{AssetName, NatureTexture},
-    },
+    loader::{self, assets::TextureAssets, datas::asset_name},
 };
 
 use super::{
@@ -106,7 +102,7 @@ fn spawn_tiles(
     generator: &ChunkGenerator,
 ) {
     let atlas_asset = texture_assets
-        .get_atlas(&AssetName::Tileset(NatureTexture::Tileset))
+        .get_atlas(&asset_name::tileset::NATURE)
         .unwrap();
     let animation_sheet = &atlas_asset.image;
     let texture_atlas_handle = &atlas_asset.layout;

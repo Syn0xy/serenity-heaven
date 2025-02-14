@@ -4,15 +4,12 @@ use bevy::{
     asset::Handle, ecs::system::Resource, render::texture::Image, sprite::TextureAtlasLayout,
 };
 
-use super::{
-    asset_descriptions::{AssetDescription, AtlasDescription},
-    datas::AssetName,
-};
+use super::asset_descriptions::{AtlasDescription, TextureDescription};
 
 #[derive(Debug, Default, Resource)]
 pub struct TextureAssets {
-    pub textures: HashMap<AssetName, TextureAsset<AssetDescription>>,
-    pub atlases: HashMap<AssetName, AtlasAsset>,
+    pub textures: HashMap<usize, TextureAsset<TextureDescription>>,
+    pub atlases: HashMap<usize, AtlasAsset>,
 }
 
 #[derive(Debug, Clone)]
@@ -42,11 +39,11 @@ impl Deref for AtlasAsset {
 }
 
 impl TextureAssets {
-    pub fn get_texture(&self, texture_name: &AssetName) -> Option<&TextureAsset<AssetDescription>> {
-        self.textures.get(texture_name)
+    pub fn get_texture(&self, asset_id: &usize) -> Option<&TextureAsset<TextureDescription>> {
+        self.textures.get(asset_id)
     }
 
-    pub fn get_atlas(&self, atlas_name: &AssetName) -> Option<&AtlasAsset> {
-        self.atlases.get(atlas_name)
+    pub fn get_atlas(&self, asset_id: &usize) -> Option<&AtlasAsset> {
+        self.atlases.get(asset_id)
     }
 }

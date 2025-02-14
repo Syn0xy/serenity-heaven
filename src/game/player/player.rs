@@ -2,15 +2,12 @@ use bevy::prelude::*;
 
 use crate::{
     game::GTransform,
-    loader::{
-        assets::TextureAssets,
-        datas::{AssetName, PlayerTexture},
-    },
+    loader::{assets::TextureAssets, datas::asset_name},
 };
 
 use super::PlayerControllerPlugin;
 
-const PLAYER_IDLE: AssetName = AssetName::Player(PlayerTexture::Idle);
+const PLAYER_IDLE: usize = asset_name::player::IDLE;
 
 pub struct PlayerPlugin;
 
