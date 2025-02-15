@@ -10,7 +10,7 @@ use bevy::{
     transform::components::Transform,
 };
 
-use crate::{loader, resolution::Resolution};
+use crate::{display::resolution::Resolution, loader};
 
 use super::{
     player::{self, Player},

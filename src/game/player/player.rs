@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{game::GTransform, loader::TextureAssets};
 
-use super::PlayerControllerPlugin;
+use super::{PlayerController, PlayerControllerPlugin};
 
 const PLAYER_ASSET: &str = "player_idle";
 
@@ -23,6 +23,7 @@ fn setup_player(mut commands: Commands, texture_assets: Res<TextureAssets>) {
 
     commands.spawn((
         Player,
+        PlayerController::default(),
         GTransform {
             position: Vec2::ZERO,
         },
