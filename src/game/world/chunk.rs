@@ -14,7 +14,11 @@ use bevy::{
 
 use crate::{
     game::GTransform,
-    loader::{self, assets::TextureAssets, datas::asset_name},
+    loader::{
+        self,
+        texture::{resource::TextureAssets, texture_id::*},
+        AssetId::{self, *},
+    },
 };
 
 use super::{
@@ -27,6 +31,8 @@ use super::{
 pub const CHUNK_SIZE: usize = 8;
 pub const CHUNK_HEIGHT: usize = 1;
 pub const CHUNK_TOTAL_LENGTH: usize = CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT;
+
+const TILESET_ID: &AssetId = &Texture(Tileset(TilesetId::Nature));
 
 #[derive(Component)]
 pub struct Chunk {
@@ -101,9 +107,7 @@ fn spawn_tiles(
     chunk_position: &Vec2,
     generator: &ChunkGenerator,
 ) {
-    let atlas_asset = texture_assets
-        .get_atlas(&asset_name::tileset::NATURE)
-        .unwrap();
+    let atlas_asset = texture_assets.get_atlas(TILESET_ID).unwrap();
     let animation_sheet = &atlas_asset.image;
     let texture_atlas_handle = &atlas_asset.layout;
 
@@ -117,7 +121,7 @@ fn spawn_tiles(
             let x = (block_index / CHUNK_SIZE) as f32;
             let y = (CHUNK_SIZE - block_index % CHUNK_SIZE) as f32;
 
-            let block_position = Vec3::new(x, y, -1.0) * loader::datas::TILE_SIZE as f32;
+            let block_position = Vec3::new(x, y, -1.0) * loader::texture::TILE_SIZE as f32;
             let block_entity = commands
                 .spawn((
                     SpriteBundle {

@@ -17,7 +17,7 @@ use super::{
     world,
 };
 
-const TILE_SIZE_F32: f32 = loader::datas::TILE_SIZE as f32;
+const TILE_SIZE_F32: f32 = loader::texture::TILE_SIZE as f32;
 
 pub struct GamePlugin;
 

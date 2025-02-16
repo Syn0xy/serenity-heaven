@@ -1,19 +1,17 @@
 use std::ops::Deref;
 
-pub type AssetPath = &'static str;
+use crate::loader::{
+    asset_description::{AssetDescription, AssetPath},
+    asset_id::AssetId,
+};
 
-pub trait AssetDescription {
-    fn get_id(&self) -> usize;
-    fn get_path(&self) -> AssetPath;
-}
-
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct TextureDescription {
-    pub id: usize,
+    pub id: AssetId,
     pub path: AssetPath,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct AtlasDescription {
     pub desc: TextureDescription,
     pub pixel_size: u32,
@@ -29,8 +27,8 @@ impl Deref for AtlasDescription {
 }
 
 impl AssetDescription for TextureDescription {
-    fn get_id(&self) -> usize {
-        self.id
+    fn get_id(&self) -> &AssetId {
+        &self.id
     }
 
     fn get_path(&self) -> AssetPath {
@@ -39,8 +37,8 @@ impl AssetDescription for TextureDescription {
 }
 
 impl AssetDescription for AtlasDescription {
-    fn get_id(&self) -> usize {
-        self.id
+    fn get_id(&self) -> &AssetId {
+        &self.id
     }
 
     fn get_path(&self) -> AssetPath {

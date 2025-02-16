@@ -1,7 +1,8 @@
 mod plugin;
 
-pub mod asset_descriptions;
-pub mod assets;
-pub mod datas;
+pub mod asset_description;
+pub mod asset_id;
+pub mod texture;
 
-pub use plugin::*;
+pub use asset_id::*;
+pub use plugin::LoaderPlugin;

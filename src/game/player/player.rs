@@ -2,12 +2,15 @@ use bevy::prelude::*;
 
 use crate::{
     game::GTransform,
-    loader::{assets::TextureAssets, datas::asset_name},
+    loader::{
+        texture::{resource::TextureAssets, texture_id::*},
+        AssetId::{self, *},
+    },
 };
 
 use super::PlayerControllerPlugin;
 
-const PLAYER_IDLE: usize = asset_name::player::IDLE;
+const PLAYER_IDLE_ID: &AssetId = &Texture(Static(StaticId::Player(PlayerId::Idle)));
 
 pub struct PlayerPlugin;
 
@@ -22,7 +25,7 @@ impl Plugin for PlayerPlugin {
 pub struct Player;
 
 fn setup_player(mut commands: Commands, texture_assets: Res<TextureAssets>) {
-    let player_image = texture_assets.get_texture(&PLAYER_IDLE).unwrap();
+    let player_image = texture_assets.get_texture(PLAYER_IDLE_ID).unwrap();
 
     commands.spawn((
         Player,
