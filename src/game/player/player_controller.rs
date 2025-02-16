@@ -1,10 +1,6 @@
 use bevy::{
     app::{App, Plugin, Update},
-    ecs::{
-        query::With,
-        schedule::IntoSystemConfigs,
-        system::{Query, ResMut, Resource},
-    },
+    ecs::{component::Component, schedule::IntoSystemConfigs, system::Query},
     input::ButtonInput,
     math::IVec2,
     prelude::{KeyCode, Res},
@@ -13,12 +9,10 @@ use bevy::{
 
 use crate::game::GTransform;
 
-use super::Player;
-
 const SPEED: f32 = 10.;
 
-#[derive(Default, Resource)]
-struct PlayerController {
+#[derive(Default, Component)]
+pub struct PlayerController {
     direction: IVec2,
 }
 
@@ -26,12 +20,15 @@ pub struct PlayerControllerPlugin;
 
 impl Plugin for PlayerControllerPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(PlayerController::default())
-            .add_systems(Update, (handle_inputs, perform_movements).chain());
+        app.add_systems(Update, (handle_inputs, perform_movements).chain());
     }
 }
 
-fn handle_inputs(keys: Res<ButtonInput<KeyCode>>, mut controller: ResMut<PlayerController>) {
+fn handle_inputs(
+    keys: Res<ButtonInput<KeyCode>>,
+    mut controller_query: Query<&mut PlayerController>,
+) {
+    let mut controller = controller_query.single_mut();
     let direction = &mut controller.direction;
 
     direction.x = 0;
@@ -49,11 +46,10 @@ fn handle_inputs(keys: Res<ButtonInput<KeyCode>>, mut controller: ResMut<PlayerC
 }
 
 fn perform_movements(
-    controller: Res<PlayerController>,
-    mut player_query: Query<&mut GTransform, With<Player>>,
+    mut player_query: Query<(&mut GTransform, &PlayerController)>,
     time: Res<Time>,
 ) {
-    let mut transform = player_query.single_mut();
+    let (mut gtransform, controller) = player_query.single_mut();
     let direction = controller.direction;
 
     if direction == IVec2::ZERO {
@@ -63,5 +59,5 @@ fn perform_movements(
     let delta_speed = time.delta_seconds() * SPEED;
     let delta = direction.as_vec2().normalize_or_zero() * delta_speed;
 
-    transform.position += delta;
+    gtransform.position += delta;
 }

@@ -8,7 +8,7 @@ use crate::{
     },
 };
 
-use super::PlayerControllerPlugin;
+use super::{PlayerController, PlayerControllerPlugin};
 
 const PLAYER_IDLE_ID: &AssetId = &Texture(Static(StaticId::Player(PlayerId::Idle)));
 
@@ -29,6 +29,7 @@ fn setup_player(mut commands: Commands, texture_assets: Res<TextureAssets>) {
 
     commands.spawn((
         Player,
+        PlayerController::default(),
         GTransform {
             position: Vec2::ZERO,
         },

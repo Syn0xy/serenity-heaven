@@ -3,11 +3,13 @@ use bevy::{
     prelude::*,
 };
 
+use super::resolution;
+
 pub struct DisplayPlugin;
 
 impl Plugin for DisplayPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(FrameTimeDiagnosticsPlugin)
+        app.add_plugins((resolution::ResolutionPlugin, FrameTimeDiagnosticsPlugin))
             .add_systems(Startup, setup_fps_display)
             .add_systems(Update, update_fps_display);
     }
