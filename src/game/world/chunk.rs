@@ -17,7 +17,6 @@ use crate::{
     loader::{
         self,
         texture::{resource::TextureAssets, texture_id::*},
-        AssetId::{self, *},
     },
 };
 
@@ -32,7 +31,7 @@ pub const CHUNK_SIZE: usize = 8;
 pub const CHUNK_HEIGHT: usize = 1;
 pub const CHUNK_TOTAL_LENGTH: usize = CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT;
 
-const TILESET_ID: &AssetId = &Texture(Tileset(TilesetId::Nature));
+const TILESET_ID: TilesetId = TilesetId::Nature;
 
 #[derive(Component)]
 pub struct Chunk {

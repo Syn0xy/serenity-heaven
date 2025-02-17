@@ -2,15 +2,12 @@ use bevy::prelude::*;
 
 use crate::{
     game::GTransform,
-    loader::{
-        texture::{resource::TextureAssets, texture_id::*},
-        AssetId::{self, *},
-    },
+    loader::texture::{resource::TextureAssets, texture_id::*},
 };
 
 use super::{PlayerController, PlayerControllerPlugin};
 
-const PLAYER_IDLE_ID: &AssetId = &Texture(Static(StaticId::Player(PlayerId::Idle)));
+const PLAYER_IDLE_ID: PlayerId = PlayerId::Idle;
 
 pub struct PlayerPlugin;
 

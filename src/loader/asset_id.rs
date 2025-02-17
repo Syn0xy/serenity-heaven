@@ -1,5 +1,3 @@
-pub use AssetId::*;
-
 use super::texture::texture_id::TextureId;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

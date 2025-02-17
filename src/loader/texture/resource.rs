@@ -4,7 +4,7 @@ use bevy::{
     asset::Handle, ecs::system::Resource, render::texture::Image, sprite::TextureAtlasLayout,
 };
 
-use crate::loader::AssetId;
+use crate::loader::asset_id::AssetId;
 
 use super::description::{AtlasDescription, TextureDescription};
 
@@ -41,11 +41,14 @@ impl Deref for AtlasAsset {
 }
 
 impl TextureAssets {
-    pub fn get_texture(&self, asset_id: &AssetId) -> Option<&TextureAsset<TextureDescription>> {
-        self.textures.get(asset_id)
+    pub fn get_texture<T: Into<AssetId>>(
+        &self,
+        asset_id: T,
+    ) -> Option<&TextureAsset<TextureDescription>> {
+        self.textures.get(&asset_id.into())
     }
 
-    pub fn get_atlas(&self, asset_id: &AssetId) -> Option<&AtlasAsset> {
-        self.atlases.get(asset_id)
+    pub fn get_atlas<T: Into<AssetId>>(&self, asset_id: T) -> Option<&AtlasAsset> {
+        self.atlases.get(&asset_id.into())
     }
 }
