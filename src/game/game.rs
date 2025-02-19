@@ -14,7 +14,7 @@ use crate::{display::resolution::Resolution, loader};
 
 use super::{
     player::{self, Player},
-    world,
+    rigidbody, world,
 };
 
 const TILE_SIZE_F32: f32 = loader::texture::TILE_SIZE as f32;
@@ -23,9 +23,13 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((world::WorldPlugin, player::PlayerPlugin))
-            .add_systems(Startup, setup_game)
-            .add_systems(PostUpdate, update_positions);
+        app.add_plugins((
+            world::WorldPlugin,
+            rigidbody::RigidbodyPlugin,
+            player::PlayerPlugin,
+        ))
+        .add_systems(Startup, setup_game)
+        .add_systems(PostUpdate, update_positions);
     }
 }
 

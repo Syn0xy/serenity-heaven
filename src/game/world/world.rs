@@ -10,7 +10,7 @@ use crate::{
 use super::{chunk, chunk_coord::ChunkCoord, chunk_generator::ChunkGenerator};
 
 pub const VIEWER_MOVE_UPDATE_THRESHOLD: f32 = chunk::CHUNK_SIZE as f32 / 4.;
-pub const CHUNK_VIEW_RADIUS: i32 = chunk::CHUNK_SIZE as i32 * 8;
+pub const CHUNK_VIEW_RADIUS: i32 = chunk::CHUNK_SIZE as i32 * 5;
 pub const CHUNK_VIEW_RADIUS_SQ: f32 = (CHUNK_VIEW_RADIUS * CHUNK_VIEW_RADIUS) as f32;
 const HALF_CHUNK_SIZE: f32 = chunk::CHUNK_SIZE as f32 / 2.0;
 
@@ -102,6 +102,11 @@ fn update_visible_chunk(
 ) {
     if chunk_is_visible(viewer_position, &chunk_coord.into()) {
         update_chunk(world, commands, chunk_coord, texture_assets);
+    } else {
+        if let Some(&entity) = world.chunks.get(chunk_coord) {
+            commands.entity(entity).despawn_recursive();
+            world.chunks.remove(chunk_coord);
+        }
     }
 }
 

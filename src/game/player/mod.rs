@@ -1,7 +1,7 @@
-mod player;
-mod player_controller;
-mod player_rigidbody;
+mod component;
+mod plugin;
 
-pub use player::*;
-pub use player_controller::*;
-pub use player_rigidbody::*;
+pub mod controller;
+
+pub use component::*;
+pub use plugin::*;

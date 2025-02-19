@@ -35,6 +35,7 @@ pub enum TilesetId {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PlayerId {
+    Test,
     Idle,
 }
 

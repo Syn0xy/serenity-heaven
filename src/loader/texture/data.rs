@@ -12,6 +12,10 @@ pub(super) const TEXTURE_ASSET_DATAS: &[TextureDescription] = &[
         id: AssetId::Texture(TextureId::Static(StaticId::Player(PlayerId::Idle))),
         path: "entities/player/player_idle.png",
     },
+    TextureDescription {
+        id: AssetId::Texture(TextureId::Static(StaticId::Player(PlayerId::Test))),
+        path: "entities/player/player_test.png",
+    },
     // SLIME
     TextureDescription {
         id: AssetId::Texture(TextureId::Static(StaticId::Slime(SlimeId::Idle))),

@@ -27,7 +27,7 @@ use super::{
     chunk_generator::{ChunkData, ChunkGenerator},
 };
 
-pub const CHUNK_SIZE: usize = 8;
+pub const CHUNK_SIZE: usize = 4;
 pub const CHUNK_HEIGHT: usize = 1;
 pub const CHUNK_TOTAL_LENGTH: usize = CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT;
 
