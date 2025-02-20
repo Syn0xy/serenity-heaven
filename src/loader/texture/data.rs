@@ -31,12 +31,23 @@ pub(super) const TEXTURE_ASSET_DATAS: &[TextureDescription] = &[
     },
 ];
 
-pub(super) const ATLAS_ASSET_DATAS: &[AtlasDescription] = &[AtlasDescription {
-    desc: TextureDescription {
-        id: AssetId::Texture(TextureId::Tileset(TilesetId::Nature)),
-        path: "nature/tileset.png",
+pub(super) const ATLAS_ASSET_DATAS: &[AtlasDescription] = &[
+    AtlasDescription {
+        desc: TextureDescription {
+            id: AssetId::Texture(TextureId::Tileset(TilesetId::Grass)),
+            path: "tileset/grass.png",
+        },
+        pixel_size: TILE_SIZE,
+        columns: 4,
+        rows: 4,
     },
-    pixel_size: TILE_SIZE,
-    columns: 25,
-    rows: 4,
-}];
+    AtlasDescription {
+        desc: TextureDescription {
+            id: AssetId::Texture(TextureId::Tileset(TilesetId::Detail)),
+            path: "tileset/detail.png",
+        },
+        pixel_size: TILE_SIZE,
+        columns: 25,
+        rows: 4,
+    },
+];

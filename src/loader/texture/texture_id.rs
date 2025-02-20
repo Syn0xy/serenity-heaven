@@ -30,7 +30,8 @@ pub enum StaticId {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TilesetId {
-    Nature,
+    Grass,
+    Detail,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

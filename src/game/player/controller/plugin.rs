@@ -10,7 +10,7 @@ use crate::game::rigidbody::Rigidbody;
 
 use super::PlayerController;
 
-const SPEED: f32 = 10.;
+const SPEED: f32 = 50.;
 
 pub struct PlayerControllerPlugin;
 

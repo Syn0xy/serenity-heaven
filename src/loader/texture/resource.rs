@@ -8,7 +8,7 @@ use crate::loader::asset_id::AssetId;
 
 use super::description::{AtlasDescription, TextureDescription};
 
-#[derive(Debug, Default, Resource)]
+#[derive(Resource, Debug, Default)]
 pub struct TextureAssets {
     pub textures: HashMap<AssetId, TextureAsset<TextureDescription>>,
     pub atlases: HashMap<AssetId, AtlasAsset>,

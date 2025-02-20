@@ -16,10 +16,10 @@ const HALF_CHUNK_SIZE: f32 = chunk::CHUNK_SIZE as f32 / 2.0;
 
 #[derive(Resource, Default)]
 pub struct World {
+    data_generator: ChunkGenerator,
     chunks: HashMap<ChunkCoord, Entity>,
     visible_chunks: Vec<ChunkCoord>,
     last_viewer_position: Option<Vec2>,
-    data_generator: ChunkGenerator,
 }
 
 pub struct WorldPlugin;
