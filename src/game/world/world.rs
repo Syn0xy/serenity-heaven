@@ -10,9 +10,8 @@ use crate::{
 use super::{chunk, chunk_coord::ChunkCoord, chunk_generator::ChunkGenerator};
 
 pub const VIEWER_MOVE_UPDATE_THRESHOLD: f32 = chunk::CHUNK_SIZE as f32 / 4.;
-pub const CHUNK_VIEW_RADIUS: i32 = chunk::CHUNK_SIZE as i32 * 5;
+pub const CHUNK_VIEW_RADIUS: i32 = chunk::CHUNK_SIZE as i32 * 4;
 pub const CHUNK_VIEW_RADIUS_SQ: f32 = (CHUNK_VIEW_RADIUS * CHUNK_VIEW_RADIUS) as f32;
-const HALF_CHUNK_SIZE: f32 = chunk::CHUNK_SIZE as f32 / 2.0;
 
 #[derive(Resource, Default)]
 pub struct World {
@@ -32,7 +31,8 @@ impl Plugin for WorldPlugin {
 }
 
 fn chunk_is_visible(viewer_position: &Vec2, chunk_position: &Vec2) -> bool {
-    (*viewer_position).distance_squared(*chunk_position + HALF_CHUNK_SIZE) <= CHUNK_VIEW_RADIUS_SQ
+    (*viewer_position).distance_squared(*chunk_position + chunk::HALF_CHUNK_SIZE_F32)
+        <= CHUNK_VIEW_RADIUS_SQ
 }
 
 fn unvisible_far_chunks(world: &mut World, commands: &mut Commands, viewer_position: &Vec2) {

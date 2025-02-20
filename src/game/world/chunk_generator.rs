@@ -8,7 +8,7 @@ const NOISE_DESCRIPTOR: NoiseDescriptor = NoiseDescriptor {
     seed: 0,
     width: chunk::CHUNK_SIZE,
     height: chunk::CHUNK_SIZE,
-    scale: 50.0,
+    scale: 60.0,
     octaves: 2,
     persistance: 0.5,
     lacunarity: 2.0,
