@@ -15,7 +15,7 @@ pub const CHUNK_VIEW_RADIUS_SQ: f32 = (CHUNK_VIEW_RADIUS * CHUNK_VIEW_RADIUS) as
 
 #[derive(Resource, Default)]
 pub struct World {
-    data_generator: ChunkGenerator,
+    generator: ChunkGenerator,
     chunks: HashMap<ChunkCoord, Entity>,
     visible_chunks: Vec<ChunkCoord>,
     last_viewer_position: Option<Vec2>,
@@ -102,6 +102,7 @@ fn update_visible_chunk(
 ) {
     if chunk_is_visible(viewer_position, &chunk_coord.into()) {
         update_chunk(world, commands, chunk_coord, texture_assets);
+        world.visible_chunks.push(*chunk_coord);
     } else {
         if let Some(&entity) = world.chunks.get(chunk_coord) {
             commands.entity(entity).despawn_recursive();
@@ -118,9 +119,8 @@ fn update_chunk(
 ) {
     if !world.chunks.contains_key(chunk_coord) {
         let chunk_entity =
-            chunk::spawn_chunk(commands, &world.data_generator, chunk_coord, texture_assets);
+            chunk::spawn_chunk(commands, &world.generator, chunk_coord, texture_assets);
 
         world.chunks.insert(*chunk_coord, chunk_entity);
     }
-    world.visible_chunks.push(*chunk_coord);
 }

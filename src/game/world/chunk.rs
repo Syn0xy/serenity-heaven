@@ -28,8 +28,8 @@ use super::{
 };
 
 pub const CHUNK_SIZE: usize = 16;
-pub const CHUNK_HEIGHT: usize = 1;
-pub const CHUNK_TOTAL_LENGTH: usize = CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT;
+pub const CHUNK_HEIGHT: usize = 2;
+pub const CHUNK_LENGTH: usize = CHUNK_SIZE * CHUNK_SIZE;
 pub const HALF_CHUNK_SIZE: usize = CHUNK_SIZE / 2;
 pub const HALF_CHUNK_SIZE_F32: f32 = HALF_CHUNK_SIZE as f32;
 
@@ -38,7 +38,7 @@ const TILESET_DETAIL_ID: TilesetId = TilesetId::Detail;
 #[derive(Component)]
 pub struct Chunk {
     _data: ChunkData,
-    blocks: [Block; CHUNK_TOTAL_LENGTH],
+    blocks: [[Block; CHUNK_LENGTH]; CHUNK_HEIGHT],
 }
 
 impl Chunk {
@@ -47,13 +47,33 @@ impl Chunk {
         Self { _data, blocks }
     }
 
-    pub fn generate_blocks(data: &ChunkData) -> [Block; CHUNK_TOTAL_LENGTH] {
-        let mut blocks = [Block::default(); CHUNK_TOTAL_LENGTH];
+    pub fn generate_blocks(data: &ChunkData) -> [[Block; CHUNK_LENGTH]; CHUNK_HEIGHT] {
+        let mut blocks = [[Block::default(); CHUNK_LENGTH]; CHUNK_HEIGHT];
         let noisemap = &data.noisemap;
+        let treemap = &data.treemap;
 
-        for block_index in 0..blocks.len() {
-            if let Some(&noise_value) = noisemap.get(block_index) {
-                blocks[block_index] = Block::new(generate_block_type(noise_value));
+        for stage_index in 0..blocks.len() {
+            for block_index in 0..blocks[stage_index].len() {
+                match stage_index {
+                    0 => {
+                        if let Some(&noise_value) = noisemap.get(block_index) {
+                            blocks[stage_index][block_index] =
+                                Block::new(generate_block_type(noise_value));
+                        }
+                    }
+                    1 => {
+                        let bottom_block = blocks[0][block_index].get_type();
+
+                        if let Some(&noise_value) = treemap.get(block_index) {
+                            if let Some(block_type) =
+                                generate_detail_block_type(bottom_block, noise_value)
+                            {
+                                blocks[stage_index][block_index] = Block::new(block_type);
+                            }
+                        }
+                    }
+                    _ => (),
+                }
             }
         }
 
@@ -64,10 +84,38 @@ impl Chunk {
 fn generate_block_type(noise_value: f32) -> BlockType {
     if noise_value < 0.45 {
         BlockType::Water
-    } else if noise_value < 0.55 {
+    } else if noise_value < 0.6 {
         BlockType::Sand
     } else {
         BlockType::Grass
+    }
+}
+
+fn generate_detail_block_type(bottom_block: &BlockType, noise_value: f32) -> Option<BlockType> {
+    match bottom_block {
+        &BlockType::Grass => {
+            if noise_value > 0.9 {
+                Some(BlockType::DeadTree)
+            } else if noise_value > 0.8 {
+                Some(BlockType::Branch)
+            } else if noise_value > 0.7 {
+                Some(BlockType::Plant)
+            } else if noise_value > 0.6 {
+                Some(BlockType::Rock)
+            } else if noise_value > 0.5 {
+                Some(BlockType::Flower)
+            } else {
+                None
+            }
+        }
+        &BlockType::Sand => {
+            if noise_value > 0.9 {
+                Some(BlockType::Pebble)
+            } else {
+                None
+            }
+        }
+        _ => None,
     }
 }
 
@@ -110,37 +158,59 @@ fn spawn_tiles(
 ) {
     let chunk = generator.generate(chunk_position);
 
-    for (block_index, block) in chunk.blocks.iter().enumerate() {
-        spawn_tile(
-            commands,
-            texture_assets,
-            chunk_entity,
-            &chunk.blocks,
-            block,
-            block_index,
-        );
+    for (stage_index, stage_blocks) in chunk.blocks.iter().enumerate() {
+        for (block_index, block) in stage_blocks.iter().enumerate() {
+            if block.is_air() {
+                continue;
+            }
+
+            let z = (CHUNK_HEIGHT - stage_index) * 2;
+            let x = block_index / CHUNK_SIZE;
+            let y = block_index % CHUNK_SIZE;
+
+            let back_position = (x, y, z + 1);
+            let fore_position = (x, y, z);
+
+            let atlas_asset = texture_assets.get_atlas(TILESET_DETAIL_ID).unwrap();
+            let atlas_index = block.get_atlas_index();
+
+            spawn_tile(
+                commands,
+                chunk_entity,
+                back_position,
+                atlas_index,
+                &atlas_asset,
+            );
+            check_connected_blocks(
+                commands,
+                chunk_entity,
+                texture_assets,
+                stage_blocks,
+                block,
+                fore_position,
+                block_index,
+            );
+        }
     }
 }
 
 fn spawn_tile(
     commands: &mut Commands,
-    texture_assets: &Res<TextureAssets>,
     chunk_entity: Entity,
-    blocks: &[Block; CHUNK_TOTAL_LENGTH],
-    block: &Block,
-    block_index: usize,
+    position: (usize, usize, usize),
+    atlas_index: usize,
+    atlas_asset: &AtlasAsset,
 ) {
-    let x = block_index / CHUNK_SIZE;
-    let y = block_index % CHUNK_SIZE;
-
-    let (atlas_asset, atlas_index) =
-        get_atlas_details(texture_assets, blocks, block, (x, y), block_index);
+    let (x, y, z) = position;
     let animation_sheet = &atlas_asset.image;
     let texture_atlas_handle = &atlas_asset.layout;
     let pixel_size = atlas_asset.pixel_size as f32;
 
-    let block_position =
-        Vec3::new(x as f32 + 0.5, (CHUNK_SIZE - y) as f32 - 0.5, -1.0) * pixel_size;
+    let block_position = Vec3::new(
+        x as f32 + 0.5,
+        (CHUNK_SIZE - y) as f32 - 0.5,
+        -1.0 - z as f32,
+    ) * pixel_size;
     let block_entity = commands
         .spawn((
             SpriteBundle {
@@ -158,13 +228,15 @@ fn spawn_tile(
     commands.entity(chunk_entity).add_child(block_entity);
 }
 
-fn get_atlas_details(
+fn check_connected_blocks(
+    commands: &mut Commands,
+    chunk_entity: Entity,
     texture_assets: &Res<TextureAssets>,
-    blocks: &[Block; CHUNK_TOTAL_LENGTH],
+    blocks: &[Block; CHUNK_LENGTH],
     block: &Block,
-    position: (usize, usize),
+    position: (usize, usize, usize),
     block_index: usize,
-) -> (AtlasAsset, usize) {
+) {
     if let Some(tileset_id) = block.get_atlas_id() {
         let atlas_asset = texture_assets.get_atlas(tileset_id).unwrap();
 
@@ -181,12 +253,13 @@ fn get_atlas_details(
             (diag_type, up_type, right_type, crnt_type),
         );
 
-        (atlas_asset.clone(), get_atlas_index(atlas_code))
-    } else {
-        (
-            texture_assets.get_atlas(TILESET_DETAIL_ID).unwrap().clone(),
-            block.get_atlas_index(),
-        )
+        spawn_tile(
+            commands,
+            chunk_entity,
+            position,
+            get_atlas_index(atlas_code),
+            atlas_asset,
+        );
     }
 }
 

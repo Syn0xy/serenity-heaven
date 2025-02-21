@@ -27,7 +27,7 @@ fn setup_player(mut commands: Commands, texture_assets: Res<TextureAssets>) {
     commands.spawn((
         Player,
         PlayerController::default(),
-        Rigidbody::new(10.0),
+        Rigidbody::new(1.0),
         GTransform {
             position: Vec2::ZERO,
         },
