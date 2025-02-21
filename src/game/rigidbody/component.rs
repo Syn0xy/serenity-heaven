@@ -36,5 +36,6 @@ impl Rigidbody {
         self.force = Vec2::ZERO;
         self.velocity += acceleration * delta_time;
         gtransform.position += self.velocity * delta_time;
+        self.velocity *= 1.0 - delta_time;
     }
 }

@@ -14,7 +14,10 @@ use bevy::{
 
 use crate::{
     game::GTransform,
-    loader::texture::{resource::TextureAssets, texture_id::*},
+    loader::texture::{
+        resource::{AtlasAsset, TextureAssets},
+        texture_id::*,
+    },
 };
 
 use super::{
@@ -30,7 +33,7 @@ pub const CHUNK_TOTAL_LENGTH: usize = CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT;
 pub const HALF_CHUNK_SIZE: usize = CHUNK_SIZE / 2;
 pub const HALF_CHUNK_SIZE_F32: f32 = HALF_CHUNK_SIZE as f32;
 
-const TILESET_GRASS_ID: TilesetId = TilesetId::Grass;
+const TILESET_DETAIL_ID: TilesetId = TilesetId::Detail;
 
 #[derive(Component)]
 pub struct Chunk {
@@ -61,11 +64,9 @@ impl Chunk {
 fn generate_block_type(noise_value: f32) -> BlockType {
     if noise_value < 0.45 {
         BlockType::Water
-    }
-    // else if noise_value < 0.55 {
-    //     BlockType::Sand
-    // }
-    else {
+    } else if noise_value < 0.55 {
+        BlockType::Sand
+    } else {
         BlockType::Grass
     }
 }
@@ -91,8 +92,8 @@ pub fn spawn_chunk(
 
     spawn_tiles(
         commands,
-        chunk_entity,
         texture_assets,
+        chunk_entity,
         &position,
         &generator,
     );
@@ -102,50 +103,90 @@ pub fn spawn_chunk(
 
 fn spawn_tiles(
     commands: &mut Commands,
-    chunk_entity: Entity,
     texture_assets: &Res<TextureAssets>,
+    chunk_entity: Entity,
     chunk_position: &Vec2,
     generator: &ChunkGenerator,
 ) {
-    let atlas_asset = texture_assets.get_atlas(TILESET_GRASS_ID).unwrap();
-    let animation_sheet = &atlas_asset.image;
-    let texture_atlas_handle = &atlas_asset.layout;
-    let pixel_size = atlas_asset.pixel_size as f32;
     let chunk = generator.generate(chunk_position);
 
     for (block_index, block) in chunk.blocks.iter().enumerate() {
-        let x = block_index / CHUNK_SIZE;
-        let y = block_index % CHUNK_SIZE;
+        spawn_tile(
+            commands,
+            texture_assets,
+            chunk_entity,
+            &chunk.blocks,
+            block,
+            block_index,
+        );
+    }
+}
 
-        let (up_index, right_index, diag_index) = get_corner_blocks(x, y, block_index);
+fn spawn_tile(
+    commands: &mut Commands,
+    texture_assets: &Res<TextureAssets>,
+    chunk_entity: Entity,
+    blocks: &[Block; CHUNK_TOTAL_LENGTH],
+    block: &Block,
+    block_index: usize,
+) {
+    let x = block_index / CHUNK_SIZE;
+    let y = block_index % CHUNK_SIZE;
+
+    let (atlas_asset, atlas_index) =
+        get_atlas_details(texture_assets, blocks, block, (x, y), block_index);
+    let animation_sheet = &atlas_asset.image;
+    let texture_atlas_handle = &atlas_asset.layout;
+    let pixel_size = atlas_asset.pixel_size as f32;
+
+    let block_position =
+        Vec3::new(x as f32 + 0.5, (CHUNK_SIZE - y) as f32 - 0.5, -1.0) * pixel_size;
+    let block_entity = commands
+        .spawn((
+            SpriteBundle {
+                texture: animation_sheet.clone(),
+                transform: Transform::from_translation(block_position),
+                ..default()
+            },
+            TextureAtlas {
+                layout: texture_atlas_handle.clone(),
+                index: atlas_index,
+            },
+        ))
+        .id();
+
+    commands.entity(chunk_entity).add_child(block_entity);
+}
+
+fn get_atlas_details(
+    texture_assets: &Res<TextureAssets>,
+    blocks: &[Block; CHUNK_TOTAL_LENGTH],
+    block: &Block,
+    position: (usize, usize),
+    block_index: usize,
+) -> (AtlasAsset, usize) {
+    if let Some(tileset_id) = block.get_atlas_id() {
+        let atlas_asset = texture_assets.get_atlas(tileset_id).unwrap();
+
+        let (up_index, right_index, diag_index) =
+            get_corner_blocks(position.0, position.1, block_index);
 
         let crnt_type = block.get_type();
-        let up_type = chunk.blocks[up_index].get_type();
-        let diag_type = chunk.blocks[diag_index].get_type();
-        let right_type = chunk.blocks[right_index].get_type();
+        let up_type = blocks[up_index].get_type();
+        let diag_type = blocks[diag_index].get_type();
+        let right_type = blocks[right_index].get_type();
 
         let atlas_code = get_atlas_code(
             &BlockType::Grass,
             (diag_type, up_type, right_type, crnt_type),
         );
 
-        let block_position =
-            Vec3::new(x as f32 + 0.5, (CHUNK_SIZE - y) as f32 - 0.5, -1.0) * pixel_size;
-        let block_entity = commands
-            .spawn((
-                SpriteBundle {
-                    texture: animation_sheet.clone(),
-                    transform: Transform::from_translation(block_position),
-                    ..default()
-                },
-                TextureAtlas {
-                    layout: texture_atlas_handle.clone(),
-                    index: get_atlas_index(atlas_code),
-                },
-            ))
-            .id();
-
-        commands.entity(chunk_entity).add_child(block_entity);
+        (atlas_asset.clone(), get_atlas_index(atlas_code))
+    } else {
+        (
+            texture_assets.get_atlas(TILESET_DETAIL_ID).unwrap().clone(),
+            block.get_atlas_index(),
+        )
     }
 }
 

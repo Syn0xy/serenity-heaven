@@ -1,3 +1,5 @@
+use crate::loader::texture::texture_id::TilesetId;
+
 use super::block_type::BlockType;
 
 #[derive(Clone, Copy, Default)]
@@ -16,6 +18,10 @@ impl Block {
 
     pub const fn get_atlas_index(&self) -> usize {
         self.block_type.get_atlas_index()
+    }
+
+    pub const fn get_atlas_id(&self) -> Option<TilesetId> {
+        self.block_type.get_atlas_id()
     }
 
     pub const fn get_type(&self) -> &BlockType {
