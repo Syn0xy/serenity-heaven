@@ -1,5 +1,12 @@
+pub mod components;
+pub mod constants;
+pub mod models;
+pub mod plugins;
+pub mod resources;
+pub mod systems;
+
 use bevy::{prelude::*, window::PresentMode};
-use serenity_heaven::{display, game, loader};
+use plugins::{assets, display, game};
 
 const WINDOW_TITLE: &str = "Serenity Heaven";
 
@@ -17,7 +24,7 @@ fn main() {
                     ..default()
                 })
                 .set(ImagePlugin::default_nearest()),
-            loader::LoaderPlugin,
+            assets::LoaderPlugin,
             game::GamePlugin,
             display::DisplayPlugin,
         ))
