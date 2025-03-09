@@ -1,7 +1,4 @@
-use bevy::{
-    app::{App, Plugin, Update},
-    ecs::{entity::Entity, system::Query},
-};
+use bevy::prelude::*;
 
 use crate::models::game::physics::{
     collider::{Collider, Collision},
@@ -12,7 +9,7 @@ pub struct ColliderPlugin;
 
 impl Plugin for ColliderPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, update_colliders);
+        app.add_systems(PostUpdate, update_colliders);
     }
 }
 
@@ -40,11 +37,11 @@ fn update_colliders(mut collider_query: Query<(Entity, &mut GTransform, &Collide
         );
 
         if let Ok((_, mut gt, _)) = collider_query.get_mut(*e1) {
-            gt.position += collision.penetration / 2.0;
+            gt.position += collision.penetration * 0.5;
         }
 
         if let Ok((_, mut gt, _)) = collider_query.get_mut(*e2) {
-            gt.position -= collision.penetration / 2.0;
+            gt.position -= collision.penetration * 0.5;
         }
     }
 }

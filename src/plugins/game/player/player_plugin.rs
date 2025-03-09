@@ -34,8 +34,8 @@ fn setup_player(mut commands: Commands, texture_assets: Res<TextureAssets>) {
         Player,
         PlayerController::default(),
         Rigidbody::new(player_datas::PLAYER_MASS, player_datas::PLAYER_DRAG),
-        // Collider::Sphere(SphereCollider::new(player_datas::PLAYER_RADIUS_COLLIDER)),
-        Collider::Box(BoxCollider::new(1.0, 1.0)),
+        Collider::Sphere(SphereCollider::new(player_datas::PLAYER_RADIUS_COLLIDER)),
+        // Collider::Box(BoxCollider::new(1.0, 1.0)),
         GTransform {
             position: Vec2::ZERO,
         },
@@ -52,7 +52,7 @@ fn setup_test(mut commands: Commands, texture_assets: Res<TextureAssets>) {
         .unwrap();
 
     commands.spawn((
-        Collider::Sphere(SphereCollider::new(3.0)),
+        Collider::Sphere(SphereCollider::new(2.0)),
         GTransform {
             position: Vec2::new(5.0, 0.0),
         },

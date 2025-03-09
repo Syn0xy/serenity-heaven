@@ -21,18 +21,18 @@ impl CollisionDetection for SphereCollider {
         other_position: Vec2,
     ) -> Option<Collision> {
         let total_radius = self.radius + sphere_collider.radius;
-        let dist = position.distance(other_position);
-        let delta = total_radius - dist;
+        let total_radius_sqr = total_radius * total_radius;
+        let dist_sqr = position.distance_squared(other_position);
+        let penetration_depth_sqr = total_radius_sqr - dist_sqr;
 
-        if delta >= 0.0 {
-            let dir = (position - other_position).normalize();
-
-            Some(Collision {
-                penetration: dir * delta,
-            })
-        } else {
-            None
+        if penetration_depth_sqr <= 0.0 {
+            return None;
         }
+
+        let dir = (position - other_position).normalize_or_zero();
+        let penetration = dir * (penetration_depth_sqr / (total_radius * 2.0));
+
+        Some(Collision { penetration })
     }
 
     fn collides_with_box(

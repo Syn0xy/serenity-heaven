@@ -60,7 +60,7 @@ pub(super) fn collides_box_and_sphere(
     box_position: Vec2,
     sphere_position: Vec2,
 ) -> Option<Collision> {
-    let half_extents = Vec2::new(box_collider.width / 2.0, box_collider.height / 2.0);
+    let half_extents = Vec2::new(box_collider.width * 0.5, box_collider.height * 0.5);
     let min = sphere_position - half_extents;
     let max = sphere_position + half_extents;
 

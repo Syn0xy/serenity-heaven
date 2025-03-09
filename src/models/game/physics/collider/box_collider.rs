@@ -1,4 +1,4 @@
-use bevy::math::{Vec2, VectorSpace};
+use bevy::math::Vec2;
 
 use super::{collides_box_and_sphere, Collision, CollisionDetection, SphereCollider};
 
@@ -30,27 +30,23 @@ impl CollisionDetection for BoxCollider {
         position: Vec2,
         other_position: Vec2,
     ) -> Option<Collision> {
+        let half_total_width = (self.width + box_collider.width) * 0.5;
+        let half_total_height = (self.height + box_collider.height) * 0.5;
         let dist_x = position.x - other_position.x;
         let dist_y = position.y - other_position.y;
-        let dist_x_abs = dist_x.abs();
-        let dist_y_abs = dist_y.abs();
-        let half_total_width = (self.width + box_collider.width) / 2.0;
-        let half_total_height = (self.height + box_collider.height) / 2.0;
+        let delta_x = half_total_width - dist_x.abs();
+        let delta_y = half_total_height - dist_y.abs();
 
-        if dist_x_abs <= half_total_width && dist_y_abs <= half_total_height {
-            let mut penetration = Vec2::ZERO;
-            let delta_x = half_total_width - dist_x;
-            let delta_y = half_total_height - dist_y;
-
-            if position.x > other_position.x {
-                penetration.x = half_total_width - dist_x_abs;
-            } else {
-                penetration.x = -half_total_width - dist_x_abs;
-            }
-
-            Some(Collision { penetration })
-        } else {
-            None
+        if delta_x <= 0.0 || delta_y <= 0.0 {
+            return None;
         }
+
+        let penetration = if delta_x > delta_y {
+            Vec2::new(0.0, delta_y.copysign(dist_y))
+        } else {
+            Vec2::new(delta_x.copysign(dist_x), 0.0)
+        };
+
+        Some(Collision { penetration })
     }
 }
