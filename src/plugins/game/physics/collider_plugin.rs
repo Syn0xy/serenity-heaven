@@ -5,11 +5,13 @@ use crate::models::game::physics::{
     GTransform,
 };
 
+use super::update_rigidbodies;
+
 pub struct ColliderPlugin;
 
 impl Plugin for ColliderPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PostUpdate, update_colliders);
+        app.add_systems(Update, update_colliders.after(update_rigidbodies));
     }
 }
 
@@ -29,19 +31,16 @@ fn update_colliders(mut collider_query: Query<(Entity, &mut GTransform, &Collide
     }
 
     for (e1, e2, collision) in &collisions {
-        println!(
-            "Collision between {:?} : {:?}   ;   {:.4?}",
-            e1.index(),
-            e2.index(),
-            collision.penetration
-        );
+        // println!("Collision: {:.4?}", collision.penetration);
+
+        let half_penetration = collision.penetration * 0.5;
 
         if let Ok((_, mut gt, _)) = collider_query.get_mut(*e1) {
-            gt.position += collision.penetration * 0.5;
+            gt.position += half_penetration;
         }
 
         if let Ok((_, mut gt, _)) = collider_query.get_mut(*e2) {
-            gt.position -= collision.penetration * 0.5;
+            gt.position -= half_penetration;
         }
     }
 }

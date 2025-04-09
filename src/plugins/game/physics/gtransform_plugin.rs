@@ -1,8 +1,11 @@
 use bevy::prelude::*;
 
-use crate::models::{
-    display::Resolution,
-    game::{physics::GTransform, player::Player},
+use crate::{
+    constants::texture_datas,
+    models::{
+        display::Resolution,
+        game::{physics::GTransform, player::Player},
+    },
 };
 
 pub struct GTransformPlugin;
@@ -14,22 +17,20 @@ impl Plugin for GTransformPlugin {
 }
 
 fn update_gtransforms(
-    mut entities_query: Query<(&GTransform, &mut Transform)>,
+    mut transforms_query: Query<(&mut Transform, &GTransform)>,
     player_query: Query<&GTransform, With<Player>>,
     resolution: Res<Resolution>,
 ) {
-    if player_query.is_empty() {
-        return;
-    }
+    if let Ok(player_gtransform) = player_query.get_single() {
+        let transform_scale = Vec3::splat(resolution.pixel_ratio);
+        let scale = texture_datas::TILE_SIZE_F32 * resolution.pixel_ratio;
+        let player_position = player_gtransform.position;
 
-    let resolution_scale = Vec3::splat(resolution.pixel_ratio);
-    let player_transform = player_query.single();
-    let player_world_position = player_transform.to_transform_position();
-
-    for (entity_transform, mut transform) in entities_query.iter_mut() {
-        let scale = resolution_scale.clone();
-        let entity_world_position = entity_transform.to_transform_position();
-        transform.translation = (entity_world_position - player_world_position) * scale;
-        transform.scale = scale;
+        for (mut transform, gtransform) in transforms_query.iter_mut() {
+            let delta_position = gtransform.position - player_position;
+            let world_position = Vec3::new(delta_position.x, delta_position.y, 0.0) * scale;
+            transform.translation = world_position.round();
+            transform.scale = transform_scale;
+        }
     }
 }

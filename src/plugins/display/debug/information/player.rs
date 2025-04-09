@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::models::game::{
     physics::{GTransform, Rigidbody},
-    player::Player,
+    player::{Player, PlayerController},
 };
 
 pub struct DebugPlayerPlugin;
@@ -19,7 +19,9 @@ struct DebugText;
 
 #[derive(Component)]
 enum DebugLabel {
+    Direction,
     Position,
+    Acceleration,
     Velocity,
     Speed,
 }
@@ -45,8 +47,20 @@ fn setup_player_display(mut commands: Commands) {
         .with_children(|parent| {
             parent.spawn((
                 DebugText,
+                DebugLabel::Direction,
+                TextBundle::from_section("Direction: ?", text_style.clone()),
+            ));
+
+            parent.spawn((
+                DebugText,
                 DebugLabel::Position,
                 TextBundle::from_section("Position: ?", text_style.clone()),
+            ));
+
+            parent.spawn((
+                DebugText,
+                DebugLabel::Acceleration,
+                TextBundle::from_section("Acceleration: ?", text_style.clone()),
             ));
 
             parent.spawn((
@@ -64,20 +78,26 @@ fn setup_player_display(mut commands: Commands) {
 }
 
 fn update_player_display(
-    player_query: Query<(&GTransform, &Rigidbody), With<Player>>,
+    player_query: Query<(&GTransform, &Rigidbody, &PlayerController), With<Player>>,
     mut text_query: Query<(&DebugLabel, &mut Text), With<DebugText>>,
 ) {
-    if let Ok((gtransform, rigidbody)) = player_query.get_single() {
+    if let Ok((gtransform, rigidbody, controller)) = player_query.get_single() {
         for (label, mut text) in &mut text_query {
             text.sections[0].value = match label {
+                DebugLabel::Direction => {
+                    format!("Direction: {:?}", controller.direction.to_array())
+                }
                 DebugLabel::Position => {
-                    format!("Position: {:.2?}", gtransform.position)
+                    format!("Position: {:.2?}", gtransform.position.to_array())
+                }
+                DebugLabel::Acceleration => {
+                    format!("Acceleration: {:.4?}", rigidbody.acceleration.to_array())
                 }
                 DebugLabel::Velocity => {
-                    format!("Velocity: {:.2?}", rigidbody.velocity)
+                    format!("Velocity: {:.4?}", rigidbody.velocity.to_array())
                 }
                 DebugLabel::Speed => {
-                    format!("Speed: {:.2?}", rigidbody.current_speed)
+                    format!("Speed: {:.8?}", rigidbody.current_speed)
                 }
             }
         }

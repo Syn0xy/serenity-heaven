@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, scene::ron::de};
 
 use crate::{
     constants::player_datas,
@@ -33,21 +33,18 @@ fn handle_inputs(
         }
     }
 
-    controller.direction = direction
+    controller.direction = direction;
 }
 
 fn perform_movements(
-    mut controller_query: Query<(&mut Rigidbody, &PlayerController)>,
+    mut movements_query: Query<(&PlayerController, &mut Rigidbody)>,
     time: Res<Time>,
 ) {
-    let (mut rigidbody, controller) = controller_query.single_mut();
+    let (controller, mut rigidbody) = movements_query.single_mut();
     let direction = controller.direction;
     let direction_normalize = direction.as_vec2().normalize_or_zero();
     let delta_time = time.delta_seconds();
+    let add_speed = player_datas::PLAYER_MAX_SPEED * delta_time;
 
-    let target_velocity = direction_normalize * player_datas::PLAYER_MAX_SPEED;
-    let max_velocity = player_datas::PLAYER_MAX_ACCEL * delta_time;
-    let new_velocity = rigidbody.velocity.lerp(target_velocity, max_velocity);
-
-    rigidbody.add_force(new_velocity, ForceMode::Acceleration);
+    rigidbody.add_force(direction_normalize * add_speed, ForceMode::Acceleration);
 }

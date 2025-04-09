@@ -41,10 +41,10 @@ impl CollisionDetection for BoxCollider {
             return None;
         }
 
-        let penetration = if delta_x > delta_y {
-            Vec2::new(0.0, delta_y.copysign(dist_y))
-        } else {
+        let penetration = if delta_x < delta_y {
             Vec2::new(delta_x.copysign(dist_x), 0.0)
+        } else {
+            Vec2::new(0.0, delta_y.copysign(dist_y))
         };
 
         Some(Collision { penetration })

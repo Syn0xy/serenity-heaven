@@ -10,14 +10,9 @@ impl Plugin for RigidbodyPlugin {
     }
 }
 
-fn update_rigidbodies(
-    mut rigidbody_query: Query<(&mut GTransform, &mut Rigidbody)>,
-    time: Res<Time>,
-) {
-    let delta_time = time.delta_seconds();
-
+pub fn update_rigidbodies(mut rigidbody_query: Query<(&mut GTransform, &mut Rigidbody)>) {
     for (mut gtransform, mut rigidbody) in rigidbody_query.iter_mut() {
-        rigidbody.update(delta_time);
+        rigidbody.update();
         gtransform.position += rigidbody.velocity;
     }
 }

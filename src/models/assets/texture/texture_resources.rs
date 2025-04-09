@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ops::Deref};
+use std::{any::TypeId, collections::HashMap, ops::Deref};
 
 use bevy::{
     asset::Handle, ecs::system::Resource, render::texture::Image, sprite::TextureAtlasLayout,
@@ -11,7 +11,7 @@ use crate::models::assets::{
 
 #[derive(Resource, Debug, Default)]
 pub struct TextureAssets {
-    pub textures: HashMap<AssetId, TextureAsset<TextureDescription>>,
+    pub textures: HashMap<TypeId, TextureAsset<TextureDescription>>,
     pub atlases: HashMap<AssetId, AtlasAsset>,
 }
 
@@ -42,11 +42,12 @@ impl Deref for AtlasAsset {
 }
 
 impl TextureAssets {
-    pub fn get_texture(
+    pub fn get_texture<T: AssetId>(
         &self,
-        asset_id: impl Into<AssetId>,
+        asset_id: T,
     ) -> Option<&TextureAsset<TextureDescription>> {
-        self.textures.get(&asset_id.into())
+        let type_id = TypeId::of::<T>();
+        self.textures.get(&type_id)
     }
 
     pub fn get_atlas(&self, asset_id: impl Into<AssetId>) -> Option<&AtlasAsset> {

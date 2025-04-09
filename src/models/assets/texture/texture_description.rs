@@ -3,28 +3,28 @@ use std::ops::Deref;
 use crate::models::assets::{AssetDescription, AssetId, AssetPath};
 
 #[derive(Debug, Clone)]
-pub struct TextureDescription {
-    pub id: AssetId,
+pub struct TextureDescription<ID> {
+    pub id: ID,
     pub path: AssetPath,
 }
 
 #[derive(Debug, Clone)]
-pub struct AtlasDescription {
-    pub desc: TextureDescription,
+pub struct AtlasDescription<ID> {
+    pub desc: TextureDescription<ID>,
     pub pixel_size: u32,
     pub columns: u32,
     pub rows: u32,
 }
 
-impl Deref for AtlasDescription {
-    type Target = TextureDescription;
+impl<ID> Deref for AtlasDescription<ID> {
+    type Target = TextureDescription<ID>;
     fn deref(&self) -> &Self::Target {
         &self.desc
     }
 }
 
-impl AssetDescription for TextureDescription {
-    fn get_id(&self) -> &AssetId {
+impl<ID> AssetDescription for TextureDescription<ID> {
+    fn get_id(&self) -> &ID {
         &self.id
     }
 
@@ -33,8 +33,8 @@ impl AssetDescription for TextureDescription {
     }
 }
 
-impl AssetDescription for AtlasDescription {
-    fn get_id(&self) -> &AssetId {
+impl<ID> AssetDescription for AtlasDescription<ID> {
+    fn get_id(&self) -> &ID {
         &self.id
     }
 

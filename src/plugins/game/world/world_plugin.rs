@@ -8,7 +8,10 @@ use crate::{
     models::{
         assets::texture::{AtlasAsset, TextureAssets},
         game::{
-            physics::GTransform,
+            physics::{
+                collider::{Collider, SphereCollider},
+                GTransform,
+            },
             player::Player,
             world::{
                 chunk::{Block, BlockType, ChunkCoord, ChunkGenerator},
@@ -183,18 +186,19 @@ fn spawn_tiles(
                 commands,
                 chunk_entity,
                 back_position,
+                block.get_type(),
                 atlas_index,
                 &atlas_asset,
             );
-            check_connected_blocks(
-                commands,
-                chunk_entity,
-                texture_assets,
-                stage_blocks,
-                block,
-                fore_position,
-                block_index,
-            );
+            // check_connected_blocks(
+            //     commands,
+            //     chunk_entity,
+            //     texture_assets,
+            //     stage_blocks,
+            //     block,
+            //     fore_position,
+            //     block_index,
+            // );
         }
     }
 }
@@ -203,6 +207,7 @@ fn spawn_tile(
     commands: &mut Commands,
     chunk_entity: Entity,
     position: (usize, usize, usize),
+    block_type: &BlockType,
     atlas_index: usize,
     atlas_asset: &AtlasAsset,
 ) {
@@ -231,6 +236,12 @@ fn spawn_tile(
         .id();
 
     commands.entity(chunk_entity).add_child(block_entity);
+
+    if block_type == &BlockType::DeadTree {
+        commands
+            .entity(block_entity)
+            .insert(Collider::Sphere(SphereCollider::new(1.0)));
+    }
 }
 
 fn check_connected_blocks(
@@ -262,6 +273,7 @@ fn check_connected_blocks(
             commands,
             chunk_entity,
             position,
+            crnt_type,
             get_atlas_index(atlas_code),
             atlas_asset,
         );

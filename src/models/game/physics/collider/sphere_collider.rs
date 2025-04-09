@@ -5,11 +5,15 @@ use super::{collides_box_and_sphere, BoxCollider, Collision, CollisionDetection}
 #[derive(Default, Debug)]
 pub struct SphereCollider {
     pub radius: f32,
+    _radius_sqr: f32,
 }
 
 impl SphereCollider {
     pub fn new(radius: f32) -> Self {
-        Self { radius }
+        Self {
+            radius,
+            _radius_sqr: radius * radius,
+        }
     }
 }
 
@@ -22,14 +26,17 @@ impl CollisionDetection for SphereCollider {
     ) -> Option<Collision> {
         let total_radius = self.radius + sphere_collider.radius;
         let total_radius_sqr = total_radius * total_radius;
-        let dist_sqr = position.distance_squared(other_position);
+        let delta = position - other_position;
+        let dist_sqr = delta.length_squared();
         let penetration_depth_sqr = total_radius_sqr - dist_sqr;
 
         if penetration_depth_sqr <= 0.0 {
             return None;
         }
 
-        let dir = (position - other_position).normalize_or_zero();
+        // let penetration_depth = total_radius - position.distance(other_position);
+
+        let dir = delta.normalize_or_zero();
         let penetration = dir * (penetration_depth_sqr / (total_radius * 2.0));
 
         Some(Collision { penetration })

@@ -30,10 +30,10 @@ fn setup_player(mut commands: Commands, texture_assets: Res<TextureAssets>) {
         .get_texture(player_datas::PLAYER_IDLE_ID)
         .unwrap();
 
-    commands.spawn((
+    let player_entity = commands.spawn((
         Player,
         PlayerController::default(),
-        Rigidbody::new(player_datas::PLAYER_MASS, player_datas::PLAYER_DRAG),
+        Rigidbody::new(player_datas::PLAYER_MASS),
         Collider::Sphere(SphereCollider::new(player_datas::PLAYER_RADIUS_COLLIDER)),
         // Collider::Box(BoxCollider::new(1.0, 1.0)),
         GTransform {
@@ -44,6 +44,8 @@ fn setup_player(mut commands: Commands, texture_assets: Res<TextureAssets>) {
             ..default()
         },
     ));
+
+    println!("Player entity: {:?}", player_entity.id());
 }
 
 fn setup_test(mut commands: Commands, texture_assets: Res<TextureAssets>) {
@@ -51,16 +53,21 @@ fn setup_test(mut commands: Commands, texture_assets: Res<TextureAssets>) {
         .get_texture(player_datas::PLAYER_IDLE_ID)
         .unwrap();
 
-    commands.spawn((
-        Collider::Sphere(SphereCollider::new(2.0)),
-        GTransform {
-            position: Vec2::new(5.0, 0.0),
-        },
-        SpriteBundle {
-            texture: player_image.image.clone(),
-            ..default()
-        },
-    ));
+    for i in 0..1 {
+        let delta = Vec2::splat(i as f32 / 50.0);
+        let sphere_entity = commands.spawn((
+            Collider::Sphere(SphereCollider::new(1.0)),
+            GTransform {
+                position: Vec2::new(5.0, 0.0) + delta,
+            },
+            SpriteBundle {
+                texture: player_image.image.clone(),
+                ..default()
+            },
+        ));
+
+        println!("Sphere entity: {:?}", sphere_entity.id());
+    }
 
     commands.spawn((
         Collider::Box(BoxCollider::new(2.0, 5.0)),

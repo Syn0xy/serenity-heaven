@@ -51,39 +51,27 @@ impl Chunk {
 }
 
 fn generate_block_type(noise_value: f32) -> BlockType {
-    if noise_value < 0.45 {
-        BlockType::Water
-    } else if noise_value < 0.6 {
-        BlockType::Sand
-    } else {
-        BlockType::Grass
+    match noise_value {
+        v if v < 0.45 => BlockType::Water,
+        v if v < 0.6 => BlockType::Sand,
+        _ => BlockType::Grass,
     }
 }
 
 fn generate_detail_block_type(bottom_block: &BlockType, noise_value: f32) -> Option<BlockType> {
     match bottom_block {
-        &BlockType::Grass => {
-            if noise_value > 0.9 {
-                Some(BlockType::DeadTree)
-            } else if noise_value > 0.8 {
-                Some(BlockType::Branch)
-            } else if noise_value > 0.7 {
-                Some(BlockType::Plant)
-            } else if noise_value > 0.6 {
-                Some(BlockType::Rock)
-            } else if noise_value > 0.5 {
-                Some(BlockType::Flower)
-            } else {
-                None
-            }
-        }
-        &BlockType::Sand => {
-            if noise_value > 0.9 {
-                Some(BlockType::Pebble)
-            } else {
-                None
-            }
-        }
+        &BlockType::Grass => match noise_value {
+            v if v > 0.9 => Some(BlockType::DeadTree),
+            v if v > 0.8 => Some(BlockType::Branch),
+            v if v > 0.7 => Some(BlockType::Plant),
+            v if v > 0.6 => Some(BlockType::Rock),
+            v if v > 0.5 => Some(BlockType::Flower),
+            _ => None,
+        },
+        &BlockType::Sand => match noise_value {
+            v if v > 0.9 => Some(BlockType::Pebble),
+            _ => None,
+        },
         _ => None,
     }
 }

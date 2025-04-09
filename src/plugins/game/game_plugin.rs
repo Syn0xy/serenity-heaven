@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use super::{physics, player, world};
+use super::{entity::player, physics, world};
 
 pub struct GamePlugin;
 

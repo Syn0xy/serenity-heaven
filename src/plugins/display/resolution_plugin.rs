@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::models::display::Resolution;
+use crate::{constants::resolution_datas::RESOLUTION_SCALE, models::display::Resolution};
 
 pub struct ResolutionPlugin;
 
@@ -15,6 +15,6 @@ fn setup_resolution(mut commands: Commands, window_query: Query<&Window>) {
 
     commands.insert_resource(Resolution {
         screen_dimensions: Vec2::new(window.width(), window.height()),
-        pixel_ratio: 4.0,
+        pixel_ratio: RESOLUTION_SCALE,
     });
 }

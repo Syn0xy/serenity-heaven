@@ -1,4 +1,4 @@
-use crate::models::assets::{texture::*, AssetId};
+use crate::models::assets::texture::*;
 
 pub const TILE_SIZE: u32 = 16;
 pub const TILE_SIZE_F32: f32 = TILE_SIZE as f32;
@@ -6,24 +6,24 @@ pub const TILE_SIZE_F32: f32 = TILE_SIZE as f32;
 pub const TEXTURE_ASSET_DATAS: &[TextureDescription] = &[
     // PLAYER
     TextureDescription {
-        id: AssetId::Texture(TextureId::Static(StaticId::Player(PlayerId::Idle))),
+        id: PlayerId::Idle,
         path: "entities/player/player_idle.png",
     },
     TextureDescription {
-        id: AssetId::Texture(TextureId::Static(StaticId::Player(PlayerId::Test))),
+        id: PlayerId::Test,
         path: "entities/player/player_test.png",
     },
     // SLIME
     TextureDescription {
-        id: AssetId::Texture(TextureId::Static(StaticId::Slime(SlimeId::Idle))),
+        id: SlimeId::Idle,
         path: "entities/slime/slime_idle.png",
     },
     TextureDescription {
-        id: AssetId::Texture(TextureId::Static(StaticId::Slime(SlimeId::Dead))),
+        id: SlimeId::Dead,
         path: "entities/slime/slime_dead.png",
     },
     TextureDescription {
-        id: AssetId::Texture(TextureId::Static(StaticId::Slime(SlimeId::Jump))),
+        id: SlimeId::Jump,
         path: "entities/slime/slime_jump.png",
     },
 ];
@@ -31,7 +31,7 @@ pub const TEXTURE_ASSET_DATAS: &[TextureDescription] = &[
 pub const ATLAS_ASSET_DATAS: &[AtlasDescription] = &[
     AtlasDescription {
         desc: TextureDescription {
-            id: AssetId::Texture(TextureId::Tileset(TilesetId::Grass)),
+            id: TilesetId::Grass,
             path: "tileset/grass.png",
         },
         pixel_size: TILE_SIZE,
@@ -40,7 +40,7 @@ pub const ATLAS_ASSET_DATAS: &[AtlasDescription] = &[
     },
     AtlasDescription {
         desc: TextureDescription {
-            id: AssetId::Texture(TextureId::Tileset(TilesetId::Detail)),
+            id: TilesetId::Detail,
             path: "tileset/detail.png",
         },
         pixel_size: TILE_SIZE,
